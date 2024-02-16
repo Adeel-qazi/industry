@@ -34,6 +34,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         Route::resource('organizations',OrganizationController::class);
 
+        // Route::get('/products-view',[OrganizationController::class, 'importView'])->name('import-view');
+        Route::post('organizations-import', [OrganizationController::class, 'import']);
+        Route::get('organizations-export', [OrganizationController::class, 'export']);
+
 
 
     });
@@ -44,10 +48,6 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::get('profile/{userId}',[UserController::class,'show']);
             Route::put('profile/{userId}',[UserController::class,'update']);
             
-             //appointments
-            // Route::post('appointments/store',[AppointmentController::class,'store']);
-            // Route::put('appointments/booked/{slotId}',[AppointmentController::class,'bookedSlot']);
-            // Route::get('appointments/edit/{event}',[AppointmentController::class,'edit']);
         });
 
 

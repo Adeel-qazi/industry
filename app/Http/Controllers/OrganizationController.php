@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportOrganization;
 use App\Http\Requests\StoreOrganizationProfileRequest;
 use App\Http\Requests\UpdateOrganizationProfileRequest;
+use App\Http\Requests\ValidateExcelRequest;
+use App\Imports\ImportOrganization;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class OrganizationController extends Controller
 {
@@ -133,6 +138,32 @@ class OrganizationController extends Controller
                 'message' => 'Authentication required to delete an organization profile.',
             ], 401);
         }
+    }
+
+
+    public function import(ValidateExcelRequest $request) 
+    {
+        try {
+            $file = $request->file;
+            if (!$file) {
+                throw new \Exception('File not found in the request.');
+            }
+            $folderName = 'files';
+            if (!Storage::exists($folderName)) {
+                Storage::makeDirectory($folderName);
+            }
+            $filePath = $file->store($folderName);
+            Excel::import(new ImportOrganization,$filePath);
+            return response()->json(['success' => true, 'message' => 'File imported successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error importing file: ' . $e->getMessage()]);
+        }
+    }
+
+
+    public function export() 
+    {
+        return Excel::download(new ExportOrganization, 'organizations.xlsx');
     }
 
 
