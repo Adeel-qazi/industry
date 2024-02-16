@@ -15,8 +15,12 @@ class RedirectIfAdminAuthenticated
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!auth()->user()){
-             return redirect()->back();
+
+        if(!auth()->user()->role == 'admin'){
+            return response()->json([
+                'status' => false,
+                'message' => 'You dont have access',
+            ], 500);
         }
         return $next($request);
     }

@@ -17,7 +17,7 @@ class AdminSeeder extends Seeder
             'name' => 'Shahbaz Khan',
             'email' => 'admin@gmail.com',
             'email_verified' => true,
-            'password' => bcrypt('12345678'),
+            'password' => '12345678',
             'role'     => 'admin',
           ]);
     }

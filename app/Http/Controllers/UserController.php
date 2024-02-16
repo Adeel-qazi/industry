@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,9 +17,10 @@ class UserController extends Controller
         $validatedData = $request->validated();
 
         try {
+            $validatedData['email_verified'] = true;
             $user = User::create($validatedData);
             // Mail::to($user->email)->send(new RegisterClientEmail($user));
-            return response()->json(['success' => true, 'message' => 'User created successfully Please wait for your account approval', 'user' => $user], 200);
+            return response()->json(['success' => true, 'message' => 'User registered successfully Please login your accounct', 'user' => $user], 200);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => $th->getMessage()], 500);
         }
@@ -69,13 +71,14 @@ class UserController extends Controller
 
 
 
-    public function update(Request $request, $userId)
+    public function update(UpdateProfileRequest $request, $userId)
     {
         try {
             $loggedInUser = auth()->user();
 
             if ($loggedInUser->id == $userId) {
                 $user = User::findOrFail($userId);
+
                 $user->update($request->validated());
 
                 return response()->json([
@@ -87,6 +90,58 @@ class UserController extends Controller
 
             return response()->json(['success' => false, 'message' => 'Permission denied'], 403);
 
+        } catch (\Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()], 500);
+        }
+    }
+
+
+    public function approved($userId)
+    {
+        try {
+            $loggedInUser = auth()->user();
+    
+            if ($loggedInUser->role == 'admin') {
+                $user = User::where('id', $userId)->where('role', 'user')->first();
+            } else {
+                return response()->json(['success' => false, 'message' => 'Permission denied.'], 403);
+            }
+    
+            if ($user) {
+                $user->update(['email_verified' => 1]);
+                // event(new ApprovedClient($user->id));
+                return response()->json(['success' => true, 'message' => 'User approved successfully.', 'user' => $user], 200);
+            } else {
+                return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+            }
+    
+        } catch (\Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()], 500);
+        }
+    }
+    
+    
+
+
+    public function disApproved($userId)
+    {
+        try {
+            $loggedInUser = auth()->user();
+    
+            if ($loggedInUser->role == 'admin') {
+                $user = User::where('id', $userId)->where('role', 'user')->first();
+            } else {
+                return response()->json(['success' => false, 'message' => 'Permission denied.'], 403);
+            }
+    
+            if ($user) {
+                $user->update(['email_verified' => 0]);
+                // event(new ApprovedClient($user->id));
+                return response()->json(['success' => true, 'message' => 'User disapproved successfully.', 'user' => $user], 200);
+            } else {
+                return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+            }
+    
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()], 500);
         }
