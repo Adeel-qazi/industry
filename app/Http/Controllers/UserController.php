@@ -17,10 +17,8 @@ class UserController extends Controller
         $validatedData = $request->validated();
 
         try {
-            $validatedData['email_verified'] = true;
             $user = User::create($validatedData);
-            // Mail::to($user->email)->send(new RegisterClientEmail($user));
-            return response()->json(['success' => true, 'message' => 'User registered successfully Please login your accounct', 'user' => $user], 200);
+            return response()->json(['success' => true, 'message' => 'User registered successfully Please wait for your account approval', 'user' => $user], 200);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => $th->getMessage()], 500);
         }

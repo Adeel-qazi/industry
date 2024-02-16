@@ -19,11 +19,15 @@ class User extends Authenticatable
         $this->attributes['password'] = Hash::make($value);
     }
 
-    
+
     public function organizations()
     {
         return $this->hasMany(Organization::class ,'user_id');
     }
+
+    // public function subscriptions(){
+    //     return $
+    // }
 
     /**
      * The attributes that are mass assignable.
