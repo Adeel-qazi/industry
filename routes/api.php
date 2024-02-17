@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         Route::get('approved/{userId}',[UserController::class, 'approved']);
         Route::get('disapprove/{userId}',[UserController::class, 'disApproved']);
+        Route::get('users',[UserController::class, 'fetchUser']);
 
         Route::resource('organizations',OrganizationController::class);
 

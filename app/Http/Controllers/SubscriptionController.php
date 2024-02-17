@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSubscriptionRequest;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 
@@ -10,9 +11,9 @@ class SubscriptionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+     public function index()
     {
-        //
+      $subscriptions = Subscription::orderBy('id','DESC')->get();
     }
 
     /**
@@ -20,15 +21,17 @@ class SubscriptionController extends Controller
      */
     public function create()
     {
-        //
+        // return view('admin.Subscription.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSubscriptionRequest $request)
     {
-        //
+        $validatedData = $request->validated();
+        Subscription::create($validatedData);
+        return redirect()->route('Subscriptions.index')->with('success','Subscription added successfully');
     }
 
     /**
@@ -44,15 +47,18 @@ class SubscriptionController extends Controller
      */
     public function edit(Subscription $subscription)
     {
-        //
+
+        return view('admin.Subscription.edit',compact('Subscription'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Subscription $subscription)
+    public function update( $request, Subscription $subscription)
     {
-        //
+        $validatedData = $request->validated();
+        $subscription->update($validatedData);
+        return redirect()->route('Subscriptions.index')->with('success','Subscription updated successfully');
     }
 
     /**
@@ -60,6 +66,7 @@ class SubscriptionController extends Controller
      */
     public function destroy(Subscription $subscription)
     {
-        //
+        $subscription->delete();
+        return redirect()->route('Subscriptions.index')->with('success','Subscription deleted successfully');
     }
 }

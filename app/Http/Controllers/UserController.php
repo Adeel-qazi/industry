@@ -145,4 +145,15 @@ class UserController extends Controller
         }
     }
 
+
+    public function fetchUser()
+    {
+        try {
+            $users = User::where('role','!=','admin')->get();
+                return response()->json(['success' => true, 'message' => 'Successfully fetched All the Users', 'user' => $users],200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 404);
+        }
+    }
+
 }
