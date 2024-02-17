@@ -61,6 +61,8 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\RedirectIfAdminAuthenticated::class,
         'user' => \App\Http\Middleware\RedirectIfUserAuthenticated::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'is_subscribe' => \App\Http\Middleware\Subscription::class,
+        'show_package' => \App\Http\Middleware\CheckPackage::class,
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
         'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
         'signed' => \App\Http\Middleware\ValidateSignature::class,

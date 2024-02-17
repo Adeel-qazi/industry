@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -155,5 +156,34 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 404);
         }
     }
+
+
+    public function profile()
+    {
+        if (auth()->check()) {
+            $user = auth()->user();
+            if ($user->role == 'user') {
+
+                $organizations = Organization::orderBy('id','DESC')->get();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Successfully fdsjkjkfdjk fetch All the profiles of organization',
+                    'data' => $organizations,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You do not have the permissions to fetch the organizations.',
+                ], 403);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to fetch an organization.',
+            ], 401);
+        }
+    }
+
 
 }

@@ -19,7 +19,30 @@ class OrganizationController extends Controller
      */
     public function index()
     {
-        //
+          if (auth()->check()) {
+            $user = auth()->user();
+            if ($user->role == 'admin') {
+
+                $organizations = Organization::orderBy('id','DESC')->get();
+                ;
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Successfully fetch All the profiles of organization',
+                    'data' => $organizations,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You do not have the permissions to fetch the organizations.',
+                ], 403);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to fetch an organization.',
+            ], 401);
+        }
     }
 
     /**

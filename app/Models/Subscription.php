@@ -9,12 +9,11 @@ class Subscription extends Model
 {
     use HasFactory;
 
-    public function users(){
-        return $this->belongsToMany(User::class,'user_subscriptions','user_id','subscription_id');
-    }
+    // public function users(){
+    //     return $this->belongsToMany(User::class,'user_subscriptions','user_id','subscription_id');
+    // }
  
     protected $fillable = [
-        'user_id',
         'plan_name',
         'price',
         'start_date',

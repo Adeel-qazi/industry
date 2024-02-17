@@ -17,7 +17,7 @@ return new class extends Migration
             $table->decimal('price', 8, 2);
             $table->string('start_date');
             $table->string('close_date');
-            $table->boolean('active')->default(true);
+            $table->boolean('active')->default(false);
             $table->timestamps();
         });
     }
