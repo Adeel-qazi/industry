@@ -40,71 +40,31 @@ class UserSubscriptionController extends Controller
     }
 
 
-    // public function createPackage(Subscription $subscription)
-    // {
-    //     $amount = $subscription->price;
-    //     try {
-    //         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
-    //                 $checkout_session = $stripe->checkout->sessions->create([
-    //             'line_items' => [
-    //                 [
-    //                     'price_data' => [
-    //                         'currency' => 'USD',
-    //                         'profile_data' => [
-    //                             'name' => 'Package',
-    //                         ],
-    //                         'unit_amount' => $amount * 100 ,
-    //                     ],
-    //                     'quantity' => 1,
-    //                 ]],
-    //                 'customer_email' => auth()->user()->email,
-                
-    //             'metadata' => [
-    //                 'package' => $subscription->id,
-    //                 'user' => auth()->user()->id,
-    //             ],
-    //             'mode' => 'payment',
-    //             'success_url' => route('checkout.success') . '?session_id={CHECKOUT_SESSION_ID}',
-    //             'cancel_url' => route('checkout.cancel'),
-                
-    //         ]);
-          
-    //         // return redirect($checkout_session->url);
-    //         return response()->json(['id' => $checkout_session->url]);
-           
-    //     } catch (\Throwable $th) {
-    //                 return response()->json(['status' => false, 'error' => $th->getMessage()]);
-    //     }
-
-    // }
-
-
-    public function storePackage(SubscribedPackageRequest $request, Subscription $subscription)
+    public function storePackage(Request $request, Subscription $subscription)
     {
-       
-
-    // $checkout_session_id = $_GET['session_id'];
 
     try {
 
-        $user = auth()->user();
-        $amount = $subscription->price;
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
 
-        $charge = Stripe\Charge::create([
-            "amount" => round($amount, 2) * 100,
-            "currency" => "USD",
-            "source" => $request->source,
-            "description" => "Test payment from HNHTECHSOLUTIONS."
-        ]);
-        if(UserSubscription::where('payment_id',$charge->id)->exists()){
-                return response()->json(['status' => false,'message'=>'invalid request payment already exists on this session id']);
-        }
-        UserSubscription::create(['user_id' => $user->id, 'subscription_id'=>$subscription->id]);
-            return response()->json(['status' => true,'message'=>'Thank you for subscribing to our platform ']);
+      $res = $stripe->tokens->create([
+            'card' => [
+              'number' => $request->number,
+              'exp_month' => $request->exp_month,
+              'exp_year' => $request->exp_year,
+              'cvc' => $request->cvc,
+            ],
+          ]);
 
-               
-       
+        $response =  $stripe->charges->create([
+            'package' => $request->packageId,
+            // 'amount' => round($request->amount, 2) * 100,
+            'currency' => "USD",
+            'source' => $request->token,
+            ]);
+
+            return response()->json([$response->status],201);
+
     } catch (\Throwable $th) {
                 return response()->json(['status' => false, 'error' => $th->getMessage()]);
     }

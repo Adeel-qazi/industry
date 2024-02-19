@@ -66,9 +66,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 
               //checkout user-subscribe
-        // Route::get('/checkout/{subscription}',[UserSubscriptionController::class,'createPackage'])->name('user.buy');//3
-        Route::post('/success',[UserSubscriptionController::class,'storePackage'])->name('checkout.success');//4
-        Route::get('/cancel',[UserSubscriptionController::class,'cancelPackage'])->name('checkout.cancel');//5
+        Route::post('stripe',[UserSubscriptionController::class,'storePackage']);
             
         });
 

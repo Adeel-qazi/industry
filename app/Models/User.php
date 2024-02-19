@@ -29,6 +29,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Subscription::class,'user_subscriptions','user_id','subscription_id');
     }
 
+    public function following()
+    {
+        return $this->belongsToMany(Organization::class, 'user_profile_followers', 'user_id', 'profile_id');
+    }
+
     /**
      * The attributes that are mass assignable.
      *
