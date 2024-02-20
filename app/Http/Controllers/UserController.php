@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminAdduserRequest;
+use App\Http\Requests\AdminUpdateUserRequest;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\UpdateProfileRequest;
@@ -95,7 +97,7 @@ class UserController extends Controller
     }
 
 
-    public function approved($userId)
+    public function statusUpdated($userId)
     {
         try {
             $loggedInUser = auth()->user();
@@ -106,13 +108,14 @@ class UserController extends Controller
                 return response()->json(['success' => false, 'message' => 'Permission denied.'], 403);
             }
     
-            if ($user) {
-                $user->update(['email_verified' => 1]);
-                // event(new ApprovedClient($user->id));
-                return response()->json(['success' => true, 'message' => 'User approved successfully.', 'user' => $user], 200);
+            
+            if ($user->email_verified == true) {
+                $user->update(['email_verified' => 0]);
             } else {
-                return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+                $user->update(['email_verified' => 1]);
             }
+            $verifiedStatus = $user->email_verified == true ? 'approved': 'disapproved';
+            return response()->json(['success' => true, 'message' => "User has been $verifiedStatus successfully.", 'user' => $user->name], 200);
     
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()], 500);
@@ -168,7 +171,7 @@ class UserController extends Controller
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Successfully fdsjkjkfdjk fetch All the profiles of organization',
+                    'message' => 'Successfully fetch All the profiles of organization',
                     'data' => $organizations,
                 ], 200);
             } else {
@@ -184,6 +187,120 @@ class UserController extends Controller
             ], 401);
         }
     }
+
+    public function addUser(AdminAdduserRequest $request)
+    {
+        $validatedData = $request->validated();
+
+        if (auth()->check()) {
+            $user = auth()->user();
+
+            if ($user->role == 'admin') {
+            $newUser = User::create($validatedData);
+                return response()->json([
+                    'status' => true,
+                    'message' => "Successfully user has been created by admin ",
+                    'data' => $newUser,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You do not have the permissions to create the user.',
+                ], 403);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to create the user.',
+            ], 401);
+        }
+    }
+
+
+    public function editUser(User $userId)
+    {
+
+        if (auth()->check()) {
+            $user = auth()->user();
+
+            if ($user->role == 'admin') {
+                return response()->json([
+                    'status' => true,
+                    'message' => "Successfully user has been retrived by admin ",
+                    'data' => $userId,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You do not have the permissions to retrive the user.',
+                ], 403);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to retrived the user.',
+            ], 401);
+        }
+
+    }
+
+
+    public function updateUser(AdminUpdateUserRequest $request, User $userId)
+    {
+        $validatedData = $request->validated();
+
+        if (auth()->check()) {
+            $user = auth()->user();
+
+            if ($user->role == 'admin') {
+                $userId->update($validatedData);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => "Successfully user has been updated by admin ",
+                    'data' => $userId,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You do not have the permissions to update the user.',
+                ], 403);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to update the user.',
+            ], 401);
+        }
+
+    }
+
+    public function destroyUser(User $userId)
+    {
+        if (auth()->check()) {
+            $user = auth()->user();
+
+            if ($user->role == 'admin') {
+                $userId->delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => "Successfully user has been deleted by admin ",
+                    'data' => $userId,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You do not have the permissions to delete the user.',
+                ], 403);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to delete the user.',
+            ], 401);
+        }
+    }
+    
 
 
 }

@@ -156,4 +156,38 @@ class SubscriptionController extends Controller
             ], 401);
         }
     }
+
+
+    public function statusUpdated($subscriptionId)
+    {
+        if (auth()->check()) {
+            $user = auth()->user();
+
+            if ($user->role == 'admin') {
+
+                $subscription = Subscription::findOrFail($subscriptionId);
+                if($subscription->active == true){
+                    $subscription->update(['active'=>0]);
+                }else{
+                    $subscription->update(['active'=>true]);
+                }
+                $verifiedStatus = $subscription->active == true ? 'active': 'inactive';
+                return response()->json([
+                    'status' => true,
+                    'message' => "Successfully subscription has been $verifiedStatus",
+                    'data' => $subscription->plan_name,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You do not have the permissions to fetch All subscriptions.',
+                ], 403);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to fetch All subscriptions.',
+            ], 401);
+        }
+    }
 }

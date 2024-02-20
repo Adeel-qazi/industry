@@ -19,11 +19,11 @@ class OrganizationController extends Controller
      */
     public function index()
     {
-          if (auth()->check()) {
+        if (auth()->check()) {
             $user = auth()->user();
             if ($user->role == 'admin') {
 
-                $organizations = Organization::orderBy('id','DESC')->get();
+                $organizations = Organization::orderBy('id', 'DESC')->get();
                 ;
 
                 return response()->json([
@@ -164,7 +164,7 @@ class OrganizationController extends Controller
     }
 
 
-    public function import(ValidateExcelRequest $request) 
+    public function import(ValidateExcelRequest $request)
     {
         try {
             $file = $request->file;
@@ -176,7 +176,7 @@ class OrganizationController extends Controller
                 Storage::makeDirectory($folderName);
             }
             $filePath = $file->store($folderName);
-            Excel::import(new ImportOrganization,$filePath);
+            Excel::import(new ImportOrganization, $filePath);
             return response()->json(['success' => true, 'message' => 'File imported successfully']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error importing file: ' . $e->getMessage()]);
@@ -184,11 +184,80 @@ class OrganizationController extends Controller
     }
 
 
-    public function export() 
+    public function export()
     {
         return Excel::download(new ExportOrganization, 'organizations.xlsx');
     }
 
+
+
+    public function followProfile($profile)
+    {
+        $organization = Organization::findOrFail($profile);
+
+        if (!auth()->check()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to follow the profile.',
+            ], 401);
+        }
+
+        $user = auth()->user();
+
+        if ($user->role !== 'user') {
+            return response()->json([
+                'status' => false,
+                'message' => 'You do not have the permissions to follow the profile.',
+            ], 403);
+        }
+
+        if ($user->following->contains($organization->id)) {
+            return response()->json([
+                'status' => true,
+                'message' => 'You are already following',
+                'data' => $organization->first_nation,
+            ], 200);
+        }
+
+        $user->following()->attach($organization->id);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User followed the profile successfully',
+            'data' => $organization->first_nation,
+        ], 200);
+
+    }
+
+
+    public function getAllProfiles()
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to fetch all profiles.',
+            ], 401);
+        }
+
+        $user = auth()->user();
+
+        if ($user->role !== 'user') {
+            return response()->json([
+                'status' => false,
+                'message' => 'You do not have the permissions to tch all profiles.',
+            ], 403);
+        }
+
+        $profiles = $user->following;
+
+
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Profiles retrieved successfully',
+            'data' => $profiles,
+        ], 200);
+    }
 
 
 }

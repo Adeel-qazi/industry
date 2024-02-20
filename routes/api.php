@@ -27,22 +27,24 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 
     Route::group(['middleware' => 'admin'], function () {
-        Route::get('/dashboard', [UserController::class, 'dashboard']);
         Route::get('profile/{userId}', [UserController::class, 'show']);
         Route::put('profile/{userId}', [UserController::class, 'update']);
 
-        Route::get('approved/{userId}',[UserController::class, 'approved']);
-        Route::get('disapprove/{userId}',[UserController::class, 'disApproved']);
+        Route::get('status-update/{userId}',[UserController::class, 'statusUpdated']);
         Route::get('users',[UserController::class, 'fetchUser']);
+        Route::post('add-user',[UserController::class, 'addUser']);
+        Route::get('edit-user/{userId}',[UserController::class, 'editUser']);
+        Route::put('update-user/{userId}',[UserController::class, 'updateUser']);
+        Route::delete('delete-user/{userId}',[UserController::class, 'destroyUser']);
 
         Route::resource('organizations',OrganizationController::class);
 
-        // Route::get('/products-view',[OrganizationController::class, 'importView'])->name('import-view');
         Route::post('organizations-import', [OrganizationController::class, 'import']);
         Route::get('organizations-export', [OrganizationController::class, 'export']);
 
         //subscription
         Route::resource('subscriptions',SubscriptionController::class);
+        Route::get('status/{subscriptionId}',[SubscriptionController::class, 'statusUpdated']);
 
 
 
@@ -51,7 +53,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 
         Route::group(['middleware'=>'user'],function(){
-            // Route::get('/dashboard',[UserController::class,'dashboard']);
+
             Route::get('profile/{userId}',[UserController::class,'show']);
             Route::put('profile/{userId}',[UserController::class,'update']);
 
@@ -64,11 +66,15 @@ Route::group(['middleware' => 'auth:api'], function () {
                 Route::get('/package',[UserSubscriptionController::class,'index'])->name('user.package');//2
             });
 
+            Route::get('profiles/follow/{profile}',[OrganizationController::class,'followProfile']);
+            Route::get('followed-profiles',[OrganizationController::class,'getAllProfiles']);
 
-              //checkout user-subscribe
+
+
         Route::post('stripe',[UserSubscriptionController::class,'storePackage']);
             
         });
+
 
 
 
