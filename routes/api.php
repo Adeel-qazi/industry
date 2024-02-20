@@ -72,7 +72,8 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 
             Route::get('profiles/follow/{profile}',[OrganizationController::class,'followProfile']);
-            Route::get('followed-profiles',[OrganizationController::class,'getAllProfiles']);
+            Route::get('followed-profiles',[OrganizationController::class,'getAllFollowedProfiles']);
+            Route::get('user-followed-profile',[OrganizationController::class,'followedProfile']);
 
 
 

@@ -7,7 +7,9 @@ use App\Http\Requests\StoreOrganizationProfileRequest;
 use App\Http\Requests\UpdateOrganizationProfileRequest;
 use App\Http\Requests\ValidateExcelRequest;
 use App\Imports\ImportOrganization;
+use App\Models\AdminActivity;
 use App\Models\Organization;
+use App\Models\UserProfileFollower;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
@@ -240,7 +242,7 @@ class OrganizationController extends Controller
     }
 
 
-    public function getAllProfiles()
+    public function getAllFollowedProfiles()
     {
         if (!auth()->check()) {
             return response()->json([
@@ -264,8 +266,39 @@ class OrganizationController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Profiles retrieved successfully',
+            'message' => 'Followed Profiles have been retrieved successfully',
             'data' => $profiles,
+        ], 200);
+    }
+
+
+    public function followedProfile()
+    {
+
+         if (!auth()->check()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to fetch all activies of admin.',
+            ], 401);
+        }
+
+        $user = auth()->user();
+
+        if ($user->role !== 'user') {
+            return response()->json([
+                'status' => false,
+                'message' => 'You do not have the permissions to fetch all activities of admin.',
+            ], 403);
+        }
+        $activity = $user->with('receivedNotifications')->get();
+    $notifications = $activity->pluck('receivedNotifications')->flatten()->map(function ($notification) {
+        return $notification;
+    });
+
+        return response()->json([
+            'status' => true,
+            'message' => 'All activity of admin have been retrieved successfully',
+            'data' => $notifications,
         ], 200);
     }
 

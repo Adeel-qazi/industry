@@ -62,14 +62,14 @@ class UserController extends Controller
             $loggedInUser = auth()->user();
 
             if ($loggedInUser->id == $userId) {
-
-            $user = User::findOrFail($userId);
-            $package = $user->subscriptions()->orderByDesc('id')->first();
-            if ($package) {
-                $createdAt = Carbon::parse($package->pivot->created_at);
+                $user = User::with('subscriptions')->findOrFail($userId);
+            
+            $userSubscription = $user->subscriptions->sortByDesc('id')->first();
+            if ($userSubscription) {
+                $createdAt = Carbon::parse($userSubscription->pivot->created_at);
                 
                 $today = Carbon::parse(now());
-                switch ($package->duration_unit) {
+                switch ($userSubscription->duration_unit) {
                     case 'weeks':
                         $unit = 'addWeeks';
                         break;
@@ -81,13 +81,10 @@ class UserController extends Controller
                         break;
                 }
                 
-                $expire = $createdAt->$unit($package->duration);
-                // dd($today,'ok',$expire);
+                $expire = $createdAt->$unit($userSubscription->duration);
             }
             
-            $user = User::with('subscriptions')->findOrFail($userId);
-            dd($user,$expire);
-            return response()->json(['success' => true, 'message' => 'User found', 'user' => $user],200);
+            return response()->json(['success' => true, 'message' => 'User found', 'user' => $user, 'expire' => $expire],200);
             }
             return response()->json(['success' => false, 'message' => 'Permission denied'], 403);
         } catch (\Exception $e) {
