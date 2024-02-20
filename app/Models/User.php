@@ -39,6 +39,16 @@ class User extends Authenticatable
         return $this->hasMany(AdminActivity::class, 'sender_id', 'receiver_id');
     }
 
+    public function sentNotifications()
+    {
+        return $this->hasMany(AdminActivity::class, 'sender_id', 'id');
+    }
+
+    public function receivedNotifications()
+    {
+        return $this->hasMany(AdminActivity::class, 'receiver_id', 'id');
+    }
+
     /**
      * The attributes that are mass assignable.
      *

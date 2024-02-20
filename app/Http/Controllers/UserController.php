@@ -7,6 +7,7 @@ use App\Http\Requests\AdminUpdateUserRequest;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use Carbon\Carbon;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -61,7 +62,31 @@ class UserController extends Controller
             $loggedInUser = auth()->user();
 
             if ($loggedInUser->id == $userId) {
+
             $user = User::findOrFail($userId);
+            $package = $user->subscriptions()->orderByDesc('id')->first();
+            if ($package) {
+                $createdAt = Carbon::parse($package->pivot->created_at);
+                
+                $today = Carbon::parse(now());
+                switch ($package->duration_unit) {
+                    case 'weeks':
+                        $unit = 'addWeeks';
+                        break;
+                    case 'months':
+                        $unit = 'addMonths';
+                        break;
+                    case 'years':
+                        $unit = 'addYears';
+                        break;
+                }
+                
+                $expire = $createdAt->$unit($package->duration);
+                // dd($today,'ok',$expire);
+            }
+            
+            $user = User::with('subscriptions')->findOrFail($userId);
+            dd($user,$expire);
             return response()->json(['success' => true, 'message' => 'User found', 'user' => $user],200);
             }
             return response()->json(['success' => false, 'message' => 'Permission denied'], 403);

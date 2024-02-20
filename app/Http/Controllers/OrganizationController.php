@@ -110,14 +110,24 @@ class OrganizationController extends Controller
      */
     public function update(UpdateOrganizationProfileRequest $request, Organization $organization)
     {
+
+        $validatedData = $request->validated();
+        
         if (auth()->check()) {
             $user = auth()->user();
 
-            if ($user->role == 'admin') {
-                $validatedData = $request->validated();
+            if ($user && $user->role == 'admin') {
                 $organization->user_id = $validatedData['user_id'] ?? $organization->user_id;
-
                 $organization->update($validatedData);
+
+                $notificationData = [
+                    'sender_id' => $user->id,
+                    'receiver_id' => $organization->user_id, 
+                    'message' => "The " . collect(array_keys($validatedData))->join(", ", " and ") . " of profile has been updated by an admin",
+                ];
+                
+                
+                $user->sentNotifications()->create($notificationData);
 
                 return response()->json([
                     'status' => true,

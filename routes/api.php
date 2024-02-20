@@ -60,7 +60,7 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::middleware('is_subscribe')->group(function(){
                 Route::get('news-feed',[UserController::class,'allProfile']);//1
             });
-            
+
     
             //user-subscribe
             Route::middleware('show_package')->group(function(){
