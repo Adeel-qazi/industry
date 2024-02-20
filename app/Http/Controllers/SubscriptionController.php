@@ -190,4 +190,33 @@ class SubscriptionController extends Controller
             ], 401);
         }
     }
+
+
+    public function getAllSubscriptions()
+    {
+        if (auth()->check()) {
+            $user = auth()->user();
+
+            if ($user->role == 'user') {
+
+                $subscriptions = Subscription::where('active',1)->orderBy('id','DESC')->get();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Successfully fetch All subscriptions',
+                    'data' => $subscriptions,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You do not have the permissions to fetch All subscriptions.',
+                ], 403);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Authentication required to fetch All subscriptions.',
+            ], 401);
+        }
+    }
 }

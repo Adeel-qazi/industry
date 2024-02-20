@@ -34,6 +34,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Organization::class, 'user_profile_followers', 'user_id', 'profile_id');
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(AdminActivity::class, 'sender_id', 'receiver_id');
+    }
+
     /**
      * The attributes that are mass assignable.
      *

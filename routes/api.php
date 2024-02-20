@@ -58,13 +58,18 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::put('profile/{userId}',[UserController::class,'update']);
 
             Route::middleware('is_subscribe')->group(function(){
-                Route::get('/news-feed',[UserController::class,'profile']);//1
+                Route::get('news-feed',[UserController::class,'allProfile']);//1
             });
+            
     
             //user-subscribe
             Route::middleware('show_package')->group(function(){
                 Route::get('/package',[UserSubscriptionController::class,'index'])->name('user.package');//2
             });
+
+            
+            Route::get('show-subscriptions',[SubscriptionController::class,'getAllSubscriptions']);
+
 
             Route::get('profiles/follow/{profile}',[OrganizationController::class,'followProfile']);
             Route::get('followed-profiles',[OrganizationController::class,'getAllProfiles']);

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('plan_name');
             $table->decimal('price', 8, 2);
-            $table->string('start_date');
-            $table->string('close_date');
+            $table->string('duration');
+            $table->enum('duration_unit',['days','weeks','months','years']);
             $table->boolean('active')->default(false);
             $table->timestamps();
         });

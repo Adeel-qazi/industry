@@ -161,7 +161,7 @@ class UserController extends Controller
     }
 
 
-    public function profile()
+    public function allProfile()
     {
         if (auth()->check()) {
             $user = auth()->user();

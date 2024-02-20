@@ -24,8 +24,8 @@ class StoreSubscriptionRequest extends FormRequest
         return [
             'plan_name' => 'required|min:3',
             'price' => 'required|numeric',
-            'start_date' => 'required|date',
-            'close_date' => 'required|date',
+            'duration' => 'required|numeric',
+            'duration_unit' => 'required|in:days,weeks,months,years',
             // 'active' => 'required|boolean',
         ];
     }
@@ -37,10 +37,10 @@ class StoreSubscriptionRequest extends FormRequest
             'plan_name.min' => 'The plan name field must be at least :min characters long',
             'price.required' => 'The price field must be required',
             'price.numeric' => 'The price field must be numeric',
-            'start_date.required' => 'The start date field must be required',
-            'start_date.date' => 'The start date field must be a valid date',
-            'close_date.required' => 'The close date field must be required',
-            'close_date.date' => 'The close date field must be a valid date',
+            'duration.required' => 'The duration field is required.',
+            'duration.numeric' => 'The duration field must be a numeric number.',
+            'duration_unit.required' => 'The duration unit field is required.',
+            'duration_unit.in' => 'The duration unit field must be one of the allowed values: days, weeks, months, years.',
             'active.required' => 'The active field must be required',
             'active.in' => 'The active field must be one of the allowed values: allowed_value1, allowed_value2',
         ];
