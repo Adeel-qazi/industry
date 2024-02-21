@@ -31,7 +31,7 @@ class User extends Authenticatable
 
     public function following()
     {
-        return $this->belongsToMany(Organization::class, 'user_profile_followers', 'user_id', 'profile_id');
+        return $this->belongsToMany(Organization::class, 'user_profile_followers', 'user_id', 'profile_id')->withPivot('status');
     }
 
     public function notifications()

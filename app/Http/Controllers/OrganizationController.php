@@ -26,7 +26,6 @@ class OrganizationController extends Controller
             if ($user->role == 'admin') {
 
                 $organizations = Organization::orderBy('id', 'DESC')->get();
-                ;
 
                 return response()->json([
                     'status' => true,
@@ -112,9 +111,8 @@ class OrganizationController extends Controller
      */
     public function update(UpdateOrganizationProfileRequest $request, Organization $organization)
     {
-
         $validatedData = $request->validated();
-        
+
         if (auth()->check()) {
             $user = auth()->user();
 
@@ -125,11 +123,11 @@ class OrganizationController extends Controller
 
                 $notificationData = [
                     'sender_id' => $user->id,
-                    'receiver_id' => $organization->user_id, 
+                    'receiver_id' => $organization->user_id,
                     'message' => "The " . collect(array_keys($validatedData))->join(", ", " and ") . " of $firstName profile has been updated by an admin",
                 ];
-                
-                
+
+
                 $user->sentNotifications()->create($notificationData);
                 $organization->update($validatedData);
 
@@ -227,7 +225,7 @@ class OrganizationController extends Controller
         }
 
         if ($user->following->contains($organization->id)) {
-        $user->following()->detach($organization->id);
+            $user->following()->detach($organization->id);
             return response()->json([
                 'status' => true,
                 'message' => 'User unfollowed the profile successfully',
@@ -235,7 +233,7 @@ class OrganizationController extends Controller
             ], 200);
         }
 
-        $user->following()->attach($organization->id);
+        $user->following()->attach($organization->id, ['status' => true]);
 
         return response()->json([
             'status' => true,
@@ -279,10 +277,7 @@ class OrganizationController extends Controller
     public function newsFeed()
     {
 
-        // dd("ok");
-
-        // $activity = AdminActivity::where('receiver_id',$receiverId)->get();
-         if (!auth()->check()) {
+        if (!auth()->check()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Authentication required to fetch all activies of admin.',
@@ -297,11 +292,10 @@ class OrganizationController extends Controller
                 'message' => 'You do not have the permissions to fetch all activities of admin.',
             ], 403);
         }
-        $activity = $user->with('receivedNotifications')->get();
-            $adminActivity  =        AdminActivity::get();
-    $notifications = $adminActivity->map(function ($notification) {
-        return $notification; 
-    });
+        $adminActivity = AdminActivity::get();
+        $notifications = $adminActivity->map(function ($notification) {
+            return $notification;
+        });
 
         return response()->json([
             'status' => true,

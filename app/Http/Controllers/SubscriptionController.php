@@ -19,7 +19,7 @@ class SubscriptionController extends Controller
 
             if ($user->role == 'admin') {
 
-                $subscriptions = Subscription::orderBy('id', 'DESC')->get();
+                $subscriptions = Subscription::orderByDesc('id')->get();
 
                 return response()->json([
                     'status' => true,

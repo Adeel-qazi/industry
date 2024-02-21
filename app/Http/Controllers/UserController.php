@@ -22,7 +22,7 @@ class UserController extends Controller
 
         try {
             $user = User::create($validatedData);
-            return response()->json(['success' => true, 'message' => 'User registered successfully Please wait for your account approval', 'user' => $user], 200);
+            return response()->json(['success' => true, 'message' => 'User has been registered successfully Please login your account', 'user' => $user], 200);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => $th->getMessage()], 500);
         }
@@ -40,12 +40,12 @@ class UserController extends Controller
                 
                 if ($user->email_verified == 1) {
                     $token = $user->createToken('user')->accessToken;
-                    return response()->json(['status' => true, 'access_token' => $token, 'user' => $user]);
+                    return response()->json(['status' => true, 'access_token' => $token, 'user' => $user],200);
                 } else {
-                    return response()->json(['status' => false, 'message' => 'You are not authorized to access.']);
+                    return response()->json(['status' => false, 'message' => 'You are not authorized to access.'],403);
                 }
             } else {
-                return response()->json(['status' => false, 'message' => 'Invalid email or password']);
+                return response()->json(['status' => false, 'message' => 'Invalid email or password'],401);
             }
         } catch (\Exception $e) {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
