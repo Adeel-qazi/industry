@@ -22,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 
+Route::get('show-subscriptions',[SubscriptionController::class,'getAllSubscriptions']);
+
+
 
 Route::group(['middleware' => 'auth:api'], function () {
 
@@ -57,8 +60,10 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::get('profile/{userId}',[UserController::class,'show']);
             Route::put('profile/{userId}',[UserController::class,'update']);
 
+
+            Route::get('profiles',[UserController::class,'allProfile']);
             Route::middleware('is_subscribe')->group(function(){
-                Route::get('news-feed',[UserController::class,'allProfile']);//1
+            // Route::get('news-feed',[UserController::class,'allProfile']);
             });
 
     
@@ -68,12 +73,11 @@ Route::group(['middleware' => 'auth:api'], function () {
             });
 
             
-            Route::get('show-subscriptions',[SubscriptionController::class,'getAllSubscriptions']);
 
 
             Route::get('profiles/follow/{profile}',[OrganizationController::class,'followProfile']);
-            Route::get('followed-profiles',[OrganizationController::class,'getAllProfiles']);
-            Route::get('user-followed-profile/{receiverId}',[OrganizationController::class,'followedProfile']);
+            Route::get('followed-profiles',[OrganizationController::class,'getAllFollowedProfiles']);
+            Route::get('news-feed',[OrganizationController::class,'newsFeed']);
 
 
 

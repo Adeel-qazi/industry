@@ -120,16 +120,19 @@ class OrganizationController extends Controller
 
             if ($user && $user->role == 'admin') {
                 $organization->user_id = $validatedData['user_id'] ?? $organization->user_id;
-                $organization->update($validatedData);
+
+                $firstName = isset($organization->first_nation) ? $organization->first_nation : '';
 
                 $notificationData = [
                     'sender_id' => $user->id,
                     'receiver_id' => $organization->user_id, 
-                    'message' => "The " . collect(array_keys($validatedData))->join(", ", " and ") . " of profile has been updated by an admin",
+                    'message' => "The " . collect(array_keys($validatedData))->join(", ", " and ") . " of $firstName profile has been updated by an admin",
                 ];
                 
                 
                 $user->sentNotifications()->create($notificationData);
+                $organization->update($validatedData);
+
 
                 return response()->json([
                     'status' => true,
@@ -224,9 +227,10 @@ class OrganizationController extends Controller
         }
 
         if ($user->following->contains($organization->id)) {
+        $user->following()->detach($organization->id);
             return response()->json([
                 'status' => true,
-                'message' => 'You are already following',
+                'message' => 'User unfollowed the profile successfully',
                 'data' => $organization->first_nation,
             ], 200);
         }
@@ -272,8 +276,10 @@ class OrganizationController extends Controller
     }
 
 
-    public function followedProfile($receiverId)
+    public function newsFeed()
     {
+
+        // dd("ok");
 
         // $activity = AdminActivity::where('receiver_id',$receiverId)->get();
          if (!auth()->check()) {
@@ -292,7 +298,8 @@ class OrganizationController extends Controller
             ], 403);
         }
         $activity = $user->with('receivedNotifications')->get();
-    $notifications = $activity->pluck('receivedNotifications')->flatten()->map(function ($notification) {
+            $adminActivity  =        AdminActivity::get();
+    $notifications = $adminActivity->map(function ($notification) {
         return $notification; 
     });
 

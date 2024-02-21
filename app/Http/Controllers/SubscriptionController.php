@@ -12,14 +12,14 @@ class SubscriptionController extends Controller
     /**
      * Display a listing of the resource.
      */
-     public function index()
+    public function index()
     {
         if (auth()->check()) {
             $user = auth()->user();
 
             if ($user->role == 'admin') {
 
-                $subscriptions = Subscription::orderBy('id','DESC')->get();
+                $subscriptions = Subscription::orderBy('id', 'DESC')->get();
 
                 return response()->json([
                     'status' => true,
@@ -38,7 +38,7 @@ class SubscriptionController extends Controller
                 'message' => 'Authentication required to fetch All subscriptions.',
             ], 401);
         }
-    
+
     }
 
     /**
@@ -77,7 +77,7 @@ class SubscriptionController extends Controller
                 'message' => 'Authentication required to create subscription.',
             ], 401);
         }
-    
+
     }
 
     /**
@@ -166,12 +166,12 @@ class SubscriptionController extends Controller
             if ($user->role == 'admin') {
 
                 $subscription = Subscription::findOrFail($subscriptionId);
-                if($subscription->active == true){
-                    $subscription->update(['active'=>0]);
-                }else{
-                    $subscription->update(['active'=>true]);
+                if ($subscription->active == true) {
+                    $subscription->update(['active' => 0]);
+                } else {
+                    $subscription->update(['active' => true]);
                 }
-                $verifiedStatus = $subscription->active == true ? 'active': 'inactive';
+                $verifiedStatus = $subscription->active == true ? 'active' : 'inactive';
                 return response()->json([
                     'status' => true,
                     'message' => "Successfully subscription has been $verifiedStatus",
@@ -194,29 +194,19 @@ class SubscriptionController extends Controller
 
     public function getAllSubscriptions()
     {
-        if (auth()->check()) {
-            $user = auth()->user();
+        try {
+            $subscriptions = Subscription::where('active', 1)->orderByDesc('id')->get();
 
-            if ($user->role == 'user') {
-
-                $subscriptions = Subscription::where('active',1)->orderBy('id','DESC')->get();
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Successfully fetch All subscriptions',
-                    'data' => $subscriptions,
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'You do not have the permissions to fetch All subscriptions.',
-                ], 403);
-            }
-        } else {
+            return response()->json([
+                'status' => true,
+                'message' => 'Successfully fetched all subscriptions',
+                'data' => $subscriptions,
+            ], 200);
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Authentication required to fetch All subscriptions.',
-            ], 401);
+                'message' => $th->getMessage(),
+            ], 500);
         }
     }
 }
