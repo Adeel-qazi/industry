@@ -197,12 +197,18 @@ class UserController extends Controller
             $user = auth()->user();
             if ($user->role == 'user') {
 
-                $organizations = Organization::with(['followers', 'followers.following'])->orderBy('id','DESC')->get();
-
+                $organizations = Organization::with(['followers' => function($q) use($user) {
+                    return $q->where('user_id', $user->id);
+                }])->orderBy('id','DESC')->get();
+                $profiles = $organizations->map(function($item) use($user) {
+                    $item['is_followed'] = isset($item->followers[0]) && $item->followers[0]->pivot->status == 1 ? 1 : 0;
+                    unset($item->followers);
+                    return $item;
+                });
                 return response()->json([
                     'status' => true,
                     'message' => 'Successfully fetch All the profiles of organization',
-                    'data' => $organizations,
+                    'data' => $profiles,
                 ], 200);
             } else {
                 return response()->json([
