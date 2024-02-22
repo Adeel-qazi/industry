@@ -43,7 +43,7 @@ class Organization extends Model
 
     public function followers()
     {
-        return $this->belongsToMany(User::class, 'user_profile_followers', 'profile_id', 'user_id');
+        return $this->belongsToMany(User::class, 'user_profile_followers', 'profile_id', 'user_id')->withPivot('status');
 
     }
 }

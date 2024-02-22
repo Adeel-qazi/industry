@@ -159,19 +159,31 @@ class OrganizationController extends Controller
         if (auth()->check()) {
             $user = auth()->user();
             if ($user->role == 'admin') {
+
                 $deletedOrganization = $organization;
+
+                $firstName = isset($organization->first_nation) ? $organization->first_nation : '';
+
+                $notificationData = [
+                    'sender_id' => $user->id,
+                    'receiver_id' => $organization->user_id,
+                    'message' => "The $firstName profile has been deleted by an admin",
+                ];
+
+
+                $user->sentNotifications()->create($notificationData);
                 $organization->delete();
-                return response()->json(['success' => true, 'message' => 'Successfully deleted the organization', 'data' => $deletedOrganization], 200);
+                return response()->json(['success' => true, 'message' => 'Successfully the profile has been deleted ', 'data' => $deletedOrganization], 200);
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'You do not have the permissions to delete an organization profile.',
+                    'message' => 'You do not have the permissions to delete the profile.',
                 ], 403);
             }
         } else {
             return response()->json([
                 'status' => false,
-                'message' => 'Authentication required to delete an organization profile.',
+                'message' => 'Authentication required to delete the profile.',
             ], 401);
         }
     }

@@ -40,7 +40,15 @@ class UserController extends Controller
                 
                 if ($user->email_verified == 1) {
                     $token = $user->createToken('user')->accessToken;
-                    return response()->json(['status' => true, 'access_token' => $token, 'user' => $user],200);
+
+                    $userData = [
+                        'user' => $user->toArray(),
+                    ];
+
+                    if ($user->subscriptions()->exists()) {
+                        $userData['subscriptions'] = $user->subscriptions->toArray();
+                    }
+                    return response()->json(['status' => true, 'access_token' => $token, 'user' => $userData],200);
                 } else {
                     return response()->json(['status' => false, 'message' => 'You are not authorized to access.'],403);
                 }
@@ -189,7 +197,7 @@ class UserController extends Controller
             $user = auth()->user();
             if ($user->role == 'user') {
 
-                $organizations = Organization::orderBy('id','DESC')->get();
+                $organizations = Organization::with(['followers', 'followers.following'])->orderBy('id','DESC')->get();
 
                 return response()->json([
                     'status' => true,

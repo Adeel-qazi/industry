@@ -26,7 +26,7 @@ class User extends Authenticatable
     }
 
     public function subscriptions(){
-        return $this->belongsToMany(Subscription::class,'user_subscriptions','user_id','subscription_id');
+        return $this->belongsToMany(Subscription::class,'user_subscriptions','user_id','subscription_id')->withPivot('payment_id');
     }
 
     public function following()
