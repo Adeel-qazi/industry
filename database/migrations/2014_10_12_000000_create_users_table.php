@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->boolean('email_verified')->default(true);
             $table->string('password');
             $table->enum('role', ['admin', 'user'])->default('admin');
+            $table->enum('status',['paid','unpaid'])->default('unpaid');
             $table->timestamps();
 
         });

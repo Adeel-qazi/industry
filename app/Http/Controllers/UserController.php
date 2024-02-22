@@ -41,14 +41,14 @@ class UserController extends Controller
                 if ($user->email_verified == 1) {
                     $token = $user->createToken('user')->accessToken;
 
-                    $userData = [
-                        'user' => $user->toArray(),
-                    ];
+                    // $userData = [
+                    //     'user' => $user->toArray(),
+                    // ];
 
-                    if ($user->subscriptions()->exists()) {
-                        $userData['subscriptions'] = $user->subscriptions->toArray();
-                    }
-                    return response()->json(['status' => true, 'access_token' => $token, 'user' => $userData],200);
+                    // if ($user->subscriptions()->exists()) {
+                    //     $userData['subscriptions'] = $user->subscriptions->toArray();
+                    // }
+                    return response()->json(['status' => true, 'access_token' => $token, 'user' => $user],200);
                 } else {
                     return response()->json(['status' => false, 'message' => 'You are not authorized to access.'],403);
                 }
