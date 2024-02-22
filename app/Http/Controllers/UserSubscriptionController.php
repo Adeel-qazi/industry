@@ -59,7 +59,7 @@ class UserSubscriptionController extends Controller
                 $user = auth()->user();
                 if ($user->role == 'user') {
                     $user->update(['status'=>'paid']);
-                    UserSubscription::create(['user_id' => $user->id, 'subscription_id ' => $request->packageId, 'payment_id' => $response->id]);
+                    UserSubscription::create(['user_id' => $user->id, 'subscription_id ' => $request->subscription_id, 'payment_id' => $response->id]);
 
                     return response()->json([
                         'status' => true,
