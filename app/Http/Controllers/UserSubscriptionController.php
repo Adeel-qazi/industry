@@ -59,7 +59,7 @@ class UserSubscriptionController extends Controller
                 $user = auth()->user();
 
                 if ($user->role == 'user') {
-                    UserSubscription::create(['user_id' => $user->id, 'package_id' => $request->packageId, 'payment_id' => $response->source]);
+                    UserSubscription::create(['user_id' => $user->id, 'package_id' => $request->packageId, 'payment_id' => $response->id]);
 
                     return response()->json([
                         'status' => true,
